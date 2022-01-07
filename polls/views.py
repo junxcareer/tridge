@@ -3,7 +3,8 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views import generic
-from rest_framework import viewsets
+from rest_framework import viewsets, filters
+import django_filters
 
 from utils.url import restify
 
@@ -17,7 +18,8 @@ class IndexView(generic.ListView):
 
     def get_queryset(self):
         """Return the last five published questions."""
-        response = requests.get(restify("/questions/"))
+        response = requests.get(restify("/questions/"),
+                                params={"ordering": "pub_date", "is_closed": False})
         questions = response.json()
         return questions[:5]
 
@@ -62,3 +64,12 @@ def vote(request, question_id):
 class QuestionViewSet(viewsets.ModelViewSet):
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
+
+
+class QuestionRestViewSet(viewsets.ModelViewSet):
+    queryset = Question.objects.all()
+    serializer_class = QuestionSerializer
+    filter_backends = [django_filters.rest_framework.DjangoFilterBackend,
+                       filters.OrderingFilter]
+    filterset_fields = ["is_closed"]
+    ordering_fields = ["pub_date"]
