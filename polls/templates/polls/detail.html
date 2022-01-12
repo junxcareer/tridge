@@ -9,17 +9,14 @@
         {% endfor %}
     </fieldset>
     <input type="submit" value="Vote">
-    {% if comment_list %}
-        <ul>
-            {% for comment in comment_list %}
-                <li>
-                    <div>
-                        <span><strong>{{ comment.name }}</strong></span><span> at {{ comment.created_on|date:"Y-m-d h:i:s" }}</span>
-                    </div>
-                    <div>{{ comment.body }}</div>
-                </li>
-            {% endfor %}
-        </ul>
-
-    {% endif %}
 </form>
+<ul>
+    {% for comment in question.comments.all %}
+        <li>
+            <div>
+                <span><strong>{{ comment.name }}</strong></span><span> at {{ comment.created_on|date:"Y-m-d h:i:s" }}</span>
+            </div>
+            <div>{{ comment.body }}</div>
+        </li>
+    {% endfor %}
+</ul>
