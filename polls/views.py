@@ -8,7 +8,7 @@ import django_filters
 
 from utils.url import restify
 
-from .models import Choice, Question
+from .models import Choice, Question, Comment
 from .serializers import QuestionSerializer
 
 
@@ -27,6 +27,13 @@ class IndexView(generic.ListView):
 class DetailView(generic.DetailView):
     model = Question
     template_name = "polls/detail.html"
+    context_object_name = 'question'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['comment_list'] = Comment.objects.filter(id=self.kwargs['pk'])
+
+        return context
 
 
 class ResultsView(generic.DetailView):
