@@ -4,8 +4,8 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views import generic
 from django.http import Http404
-from django.utils.encoding import uri_to_iri
 from rest_framework import viewsets, filters
+from django.utils import timezone
 import django_filters
 
 from utils.url import restify
@@ -33,6 +33,18 @@ class DetailView(generic.DetailView):
     def get_object(self, **kwargs):
         pk = self.kwargs.get('pk')
         return get_object_or_404(Question, pk=pk)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        pk = self.kwargs.get('pk')
+        choices = Choice.objects.filter(question_id=pk).order_by('-created_on')
+        for choice in choices:
+            if choice.created_on > timezone.now() - timezone.timedelta(minutes=10):
+                choice.suggested = True
+
+        context['choices'] = choices
+        return context
+
 
 
 class ResultsView(generic.DetailView):
