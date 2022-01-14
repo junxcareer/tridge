@@ -28,6 +28,9 @@ class Choice(models.Model):
     def __str__(self):
         return self.choice_text
 
+    def was_created_recently(self):
+        return self.created_on >= timezone.now() - datetime.timedelta(days=1)
+
 
 class Comment(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='comments')

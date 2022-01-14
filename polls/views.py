@@ -46,7 +46,7 @@ class DetailView(generic.DetailView):
             if suggested_count >= suggested_limit:
                 break
 
-            if choice.created_on > timezone.now() - timezone.timedelta(days=1):
+            if choice.was_created_recently():
                 choice.suggested = True
                 suggested_count += 1
 
