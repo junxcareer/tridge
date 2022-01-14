@@ -1,0 +1,19 @@
+<div>
+    <h3>Choices for the question "{{ question.question_text }}"</h3>
+    <ol>
+        {% for choice in choices %}
+
+            <li>
+                {{ choice.choice_text }} {% if choice.suggested %} (new!) {% endif %}
+            </li>
+        {% endfor %}
+    </ol>
+    <form action="{% url 'polls:choice' question.id %}" method="post" id="choice_form">
+        {% csrf_token %}
+        <div>
+            <label for="choice_body">New Choice: </label>
+            <textarea id="choice_body" name="choice_text" form="choice_form"></textarea>
+        </div>
+        <input type="submit" value="Submit">
+    </form>
+</div>

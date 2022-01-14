@@ -4,12 +4,12 @@
         <legend><h1>{{ question.question_text }}</h1></legend>
         {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
         {% for choice in choices %}
-
             <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
             <label for="choice{{ forloop.counter }}">
                 {{ choice.choice_text }} {% if choice.suggested %} (new!) {% endif %}
             </label><br>
         {% endfor %}
+        <a href="{% url 'polls:choice' question.id %}">new choice</a>
     </fieldset>
     <input type="submit" value="Vote">
 </form>
@@ -24,7 +24,7 @@
                     </div>
                     <div>{{ comment.body }}</div>
                     <div><a href="{% url 'polls:reply' comment.id %}">reply</a></div>
-                    <div>&nbsp;</div>
+                    <br>
                     {% include "polls/comment_tree.html" with parent_comment=comment comments=question.comments.all %}
                 </li>
             {% endif %}

@@ -11,7 +11,7 @@ import django_filters
 from utils.url import restify
 
 from .models import Choice, Question, Comment
-from .forms import CommentForm
+from .forms import CommentForm, ChoiceForm
 from .serializers import QuestionSerializer
 
 
@@ -22,7 +22,7 @@ class IndexView(generic.ListView):
     def get_queryset(self):
         """Return the last five published questions."""
         response = requests.get(restify("/questions/"),
-                                params={"ordering": "pub_date", "is_closed": False})
+                                params={"ordering": "pub_date", "closed_at__gte": timezone.now()})
         questions = response.json()
         return questions[:5]
 
@@ -100,6 +100,31 @@ def add_reply(request, comment_id):
         raise Http404('No valid access')
 
 
+def add_choice(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    choices = question.choice_set.all()
+
+    if request.method == 'GET':
+        return render(
+            request,
+            "polls/choice.html",
+            {
+                "choices": choices,
+                "question": question
+            }
+        )
+    elif request.method == 'POST':
+        choice_form = ChoiceForm(data=request.POST)
+        if choice_form.is_valid():
+            new_comment = choice_form.save(commit=False)
+            new_comment.question = question
+            new_comment.save()
+
+        return HttpResponseRedirect(reverse("polls:detail", args=(question.id,)))
+    else:
+        raise Http404('No valid access')
+
+
 def vote(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     try:
@@ -137,5 +162,5 @@ class QuestionRestViewSet(viewsets.ModelViewSet):
     serializer_class = QuestionSerializer
     filter_backends = [django_filters.rest_framework.DjangoFilterBackend,
                        filters.OrderingFilter]
-    filterset_fields = ["is_closed"]
+    filterset_fields = {"closed_at": ['gte']}
     ordering_fields = ["pub_date"]

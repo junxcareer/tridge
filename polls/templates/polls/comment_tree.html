@@ -7,7 +7,7 @@
                 </div>
                 <div>{{ comment.body }}</div>
                 <div><a href="{% url 'polls:reply' comment.id %}">reply</a></div>
-                <div>&nbsp;</div>
+                <br>
                 {% include "polls/comment_tree.html" with parent_comment=comment comments=comments %}
             </li>
         </ul>
