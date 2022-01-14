@@ -3,13 +3,18 @@
     <fieldset>
         <legend><h1>{{ question.question_text }}</h1></legend>
         {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-        {% for choice in choices %}
+        {% for choice in question.choice_set.all %}
             <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
             <label for="choice{{ forloop.counter }}">
                 {{ choice.choice_text }} {% if choice.suggested %} (new!) {% endif %}
             </label><br>
         {% endfor %}
-        <a href="{% url 'polls:choice' question.id %}">new choice</a>
+        <br>
+        {% if is_to_limit %}
+            Can't suggest new choice (limit: {{ question.max_choices }})
+        {% else %}
+            <a href="{% url 'polls:choice' question.id %}">new choice</a>
+        {% endif %}
     </fieldset>
     <input type="submit" value="Vote">
 </form>

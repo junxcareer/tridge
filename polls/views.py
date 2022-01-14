@@ -37,20 +37,10 @@ class DetailView(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         pk = self.kwargs.get('pk')
-        choices = Choice.objects.filter(question_id=pk).order_by('-created_on')
+        choices = Choice.objects.filter(question_id=pk)
 
-        suggested_limit = 1
-        suggested_count = 0
-
-        for choice in choices:
-            if suggested_count >= suggested_limit:
-                break
-
-            if choice.was_created_recently():
-                choice.suggested = True
-                suggested_count += 1
-
-        context['choices'] = choices
+        is_to_limit = len(choices) == self.get_object().max_choices
+        context['is_to_limit'] = is_to_limit
 
         return context
 
@@ -104,21 +94,26 @@ def add_choice(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     choices = question.choice_set.all()
 
+    is_to_limit = len(choices) == question.max_choices
+
     if request.method == 'GET':
         return render(
             request,
             "polls/choice.html",
             {
                 "choices": choices,
-                "question": question
+                "question": question,
+                "is_to_limit": is_to_limit
             }
         )
+
     elif request.method == 'POST':
-        choice_form = ChoiceForm(data=request.POST)
-        if choice_form.is_valid():
-            new_comment = choice_form.save(commit=False)
-            new_comment.question = question
-            new_comment.save()
+        if not is_to_limit:
+            choice_form = ChoiceForm(data=request.POST)
+            if choice_form.is_valid():
+                new_comment = choice_form.save(commit=False)
+                new_comment.question = question
+                new_comment.save()
 
         return HttpResponseRedirect(reverse("polls:detail", args=(question.id,)))
     else:

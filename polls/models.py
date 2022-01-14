@@ -8,6 +8,7 @@ class Question(models.Model):
     question_text = models.CharField(max_length=200)
     pub_date = models.DateTimeField("date published", auto_now_add=True)
     closed_at = models.DateTimeField("date closed", default=timezone.now() + timezone.timedelta(weeks=1))
+    max_choices = models.IntegerField(default=5)
 
     class Meta:
         ordering = ['pub_date']
