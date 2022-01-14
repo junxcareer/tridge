@@ -2,9 +2,8 @@
     <h3>Choices for the question "{{ question.question_text }}"</h3>
     <ol>
         {% for choice in choices %}
-
             <li>
-                {{ choice.choice_text }} {% if choice.suggested %} (new!) {% endif %}
+                {{ choice.choice_text }} {% if choice.approved %} (approved) {% endif %}
             </li>
         {% endfor %}
     </ol>
