@@ -1,0 +1,15 @@
+{% for comment in comments %}
+    {% if comment.parent_id == parent_comment.id %}
+        <ul>
+            <li>
+                <div>
+                    <span><strong>{{ comment.name }}</strong></span><span> at {{ comment.created_on|date:"Y-m-d h:i:s" }}</span>
+                </div>
+                <div>{{ comment.body }}</div>
+                <div><a href="{% url 'polls:reply' comment.id %}">reply</a></div>
+                <div>&nbsp;</div>
+                {% include "polls/comment_tree.html" with parent_comment=comment comments=comments %}
+            </li>
+        </ul>
+    {% endif %}
+{% endfor %}

@@ -36,23 +36,44 @@ class ResultsView(generic.DetailView):
     template_name = "polls/results.html"
 
 
-def comment(request, question_id):
+def add_comment(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
 
     if request.method == 'POST':
         comment_form = CommentForm(data=request.POST)
         if comment_form.is_valid():
-            # Create Comment object but don't save to database yet
             new_comment = comment_form.save(commit=False)
-            # Assign the current question to the comment
             new_comment.question = question
-            # Save the comment to the database
             new_comment.save()
-
     else:
         raise Http404('No valid access')
 
     return HttpResponseRedirect(reverse("polls:detail", args=(question_id,)))
+
+
+def add_reply(request, comment_id):
+    comment = get_object_or_404(Comment, pk=comment_id)
+    question = get_object_or_404(Question, pk=comment.question_id)
+
+    if request.method == 'GET':
+        return render(
+            request,
+            "polls/comment.html",
+            {
+                "comment": comment
+            }
+        )
+    elif request.method == 'POST':
+        comment_form = CommentForm(data=request.POST)
+        if comment_form.is_valid():
+            new_comment = comment_form.save(commit=False)
+            new_comment.question = question
+            new_comment.parent_id = comment_id
+            new_comment.save()
+
+        return HttpResponseRedirect(reverse("polls:detail", args=(question.id,)))
+    else:
+        raise Http404('No valid access')
 
 
 def vote(request, question_id):

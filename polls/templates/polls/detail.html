@@ -10,16 +10,25 @@
     </fieldset>
     <input type="submit" value="Vote">
 </form>
-<ul>
-    {% for comment in question.comments.all %}
-        <li>
-            <div>
-                <span><strong>{{ comment.name }}</strong></span><span> at {{ comment.created_on|date:"Y-m-d h:i:s" }}</span>
-            </div>
-            <div>{{ comment.body }}</div>
-        </li>
-    {% endfor %}
-</ul>
+
+<div>
+    <ul>
+        {% for comment in question.comments.all %}
+            {% if not comment.parent_id %}
+                <li>
+                    <div>
+                        <span><strong>{{ comment.name }}</strong></span><span> at {{ comment.created_on|date:"Y-m-d h:i:s" }}</span>
+                    </div>
+                    <div>{{ comment.body }}</div>
+                    <div><a href="{% url 'polls:reply' comment.id %}">reply</a></div>
+                    <div>&nbsp;</div>
+                    {% include "polls/comment_tree.html" with parent_comment=comment comments=question.comments.all %}
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+</div>
+
 <div>
     {% if new_comment %}
         <div>
