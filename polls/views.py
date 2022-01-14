@@ -38,13 +38,21 @@ class DetailView(generic.DetailView):
         context = super().get_context_data(**kwargs)
         pk = self.kwargs.get('pk')
         choices = Choice.objects.filter(question_id=pk).order_by('-created_on')
+
+        suggested_limit = 1
+        suggested_count = 0
+
         for choice in choices:
-            if choice.created_on > timezone.now() - timezone.timedelta(minutes=10):
+            if suggested_count >= suggested_limit:
+                break
+
+            if choice.created_on > timezone.now() - timezone.timedelta(days=1):
                 choice.suggested = True
+                suggested_count += 1
 
         context['choices'] = choices
-        return context
 
+        return context
 
 
 class ResultsView(generic.DetailView):
