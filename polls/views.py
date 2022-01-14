@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views import generic
 from django.http import Http404
+from django.utils.encoding import uri_to_iri
 from rest_framework import viewsets, filters
 import django_filters
 
@@ -27,8 +28,11 @@ class IndexView(generic.ListView):
 
 
 class DetailView(generic.DetailView):
-    model = Question
     template_name = "polls/detail.html"
+
+    def get_object(self, **kwargs):
+        pk = self.kwargs.get('pk')
+        return get_object_or_404(Question, pk=pk)
 
 
 class ResultsView(generic.DetailView):
