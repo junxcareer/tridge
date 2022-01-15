@@ -16,7 +16,6 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
@@ -26,14 +25,12 @@ SECRET_KEY = "django-insecure-=bg0t$cdqr!7j$d4san^^9x-erx7zf0u(srs_)5#wxj1n8ux4r
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-
 # Host
 # ====
 
 API_HOST = '127.0.0.1:8000'
 ALLOWED_HOSTS = ['127.0.0.1']
 DEFAULT_HTTP_SCHEME = 'http'
-
 
 # Application definition
 
@@ -47,6 +44,7 @@ INSTALLED_APPS = [
     "django_filters",
 
     "polls.apps.PollsConfig",
+    "users.apps.UsersConfig",
 ]
 
 MIDDLEWARE = [
@@ -79,7 +77,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "hamji.wsgi.application"
 
-
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
@@ -89,7 +86,6 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -109,7 +105,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
@@ -122,7 +117,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
@@ -138,3 +132,7 @@ REST_FRAMEWORK = {
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
 }
+
+# Authentification
+LOGIN_REDIRECT_URL = 'polls:index'
+LOGOUT_REDIRECT_URL = 'users:login'
