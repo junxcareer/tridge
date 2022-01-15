@@ -4,15 +4,16 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views import generic
 from django.http import Http404
-from rest_framework import viewsets, filters
 from django.utils import timezone
 import django_filters
+from rest_framework import viewsets, filters, pagination
 
 from utils.url import restify
 
 from .models import Choice, Question, Comment
 from .forms import CommentForm, ChoiceForm
 from .serializers import QuestionSerializer
+from .paginations import QuestionPagination
 
 
 class IndexView(generic.ListView):
@@ -22,9 +23,13 @@ class IndexView(generic.ListView):
     def get_queryset(self):
         """Return the last five published questions."""
         response = requests.get(restify("/questions/"),
-                                params={"ordering": "pub_date", "closed_at__gte": timezone.now()})
+                                params={"ordering": "-pub_date",
+                                        # "limit": 5,
+                                        # "offset": 0,
+                                        "closed_at__gte": timezone.now()})
+
         questions = response.json()
-        return questions[:5]
+        return questions.get('results')
 
 
 class DetailView(generic.DetailView):
@@ -155,6 +160,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
 class QuestionRestViewSet(viewsets.ModelViewSet):
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
+    pagination_class = QuestionPagination
     filter_backends = [django_filters.rest_framework.DjangoFilterBackend,
                        filters.OrderingFilter]
     filterset_fields = {"closed_at": ['gte']}
