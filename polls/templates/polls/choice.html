@@ -1,9 +1,28 @@
+<div align="right">
+    {% if user.is_authenticated %}
+        <span>Welcome, {{ user.username }}&nbsp;&nbsp;</span>
+        <span><a href="{% url 'logout' %}">Logout</a></span>
+    {% else %}
+        <span><a href="{% url 'users:signup' %}">Sign Up</a>&nbsp;&nbsp;</span>
+        <span><a href="{% url 'users:login' %}">Log In</a></span>
+    {% endif %}
+</div>
+
 <div>
     <h3>Choices for the question "{{ question.question_text }}"</h3>
     <ol>
         {% for choice in choices %}
             <li>
-                {{ choice.choice_text }} {% if choice.approved %} (approved) {% endif %}
+                {{ choice.choice_text }}
+                {% if is_creator %}
+                    {% if choice.approved %}
+                        <a href={% url 'polls:approve_choice' choice.id %}>cancel</a>
+                    {% else %}
+                        <a href={% url 'polls:approve_choice' choice.id %}>approve</a>
+                    {% endif %}
+                {% else %}
+                    {% if choice.approved %} (approved) {% endif %}
+                {% endif %}
             </li>
         {% endfor %}
     </ol>

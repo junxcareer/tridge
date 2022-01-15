@@ -2,6 +2,7 @@ import datetime
 
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import User
 
 
 class Question(models.Model):
@@ -9,6 +10,7 @@ class Question(models.Model):
     pub_date = models.DateTimeField("date published", auto_now_add=True)
     closed_at = models.DateTimeField("date closed", default=timezone.now() + timezone.timedelta(weeks=1))
     max_choices = models.IntegerField(default=5)
+    creator = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
         ordering = ['pub_date']

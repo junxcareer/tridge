@@ -1,7 +1,18 @@
+<div align="right">
+    {% if user.is_authenticated %}
+        <span>Welcome, {{ user.username }}&nbsp;&nbsp;</span>
+        <span><a href="{% url 'logout' %}">Logout</a></span>
+    {% else %}
+        <span><a href="{% url 'users:signup' %}">Sign Up</a>&nbsp;&nbsp;</span>
+        <span><a href="{% url 'users:login' %}">Log In</a></span>
+    {% endif %}
+</div>
+
 <form action="{% url 'polls:vote' question.id %}" method="post">
     {% csrf_token %}
     <fieldset>
         <legend><h1>{{ question.question_text }}</h1></legend>
+        <div>created by {{ question.creator.username }}</div>
         {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
         {% for choice in question.choice_set.all %}
             {% if choice.approved %}
@@ -12,10 +23,18 @@
             {% endif %}
         {% endfor %}
         <br>
-        {% if is_to_limit %}
-            Can't suggest new choice (limit: {{ question.max_choices }})
+        {% if is_creator %}
+            <a href="{% url 'polls:choice' question.id %}">
+                Manage choices
+            </a>
         {% else %}
-            <a href="{% url 'polls:choice' question.id %}">new choice</a>
+            {% if is_to_limit %}
+                Can't suggest new choice (limit: {{ question.max_choices }})
+            {% else %}
+                <a href="{% url 'polls:choice' question.id %}">
+                    Suggest new choice
+                </a>
+            {% endif %}
         {% endif %}
     </fieldset>
     <input type="submit" value="Vote">

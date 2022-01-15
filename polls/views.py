@@ -33,6 +33,27 @@ class IndexView(generic.ListView):
         return questions.get('results')
 
 
+class ChoiceView(generic.ListView):
+    model = Choice
+    template_name = "polls/choice.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        question_id = self.kwargs.get('question_id')
+        question = get_object_or_404(Question, pk=question_id)
+        context['question'] = question
+
+        choices = question.choice_set.all()
+        context['choices'] = choices
+
+        user = self.request.user
+        is_creator = user.id == question.creator_id
+        context['is_creator'] = is_creator
+
+        return context
+
+
 class DetailView(generic.DetailView):
     template_name = "polls/detail.html"
 
@@ -47,6 +68,10 @@ class DetailView(generic.DetailView):
 
         is_to_limit = len(choices) == self.get_object().max_choices
         context['is_to_limit'] = is_to_limit
+
+        user = self.request.user
+        is_creator = user.id == self.get_object().creator_id
+        context['is_creator'] = is_creator
 
         return context
 
@@ -94,6 +119,21 @@ def add_reply(request, comment_id):
         return HttpResponseRedirect(reverse("polls:detail", args=(question.id,)))
     else:
         raise Http404('No valid access')
+
+
+def approve_choice(request, choice_id):
+    choice = get_object_or_404(Choice, pk=choice_id)
+    creator = request.user
+
+    is_creator = creator.id == choice.question.creator_id
+
+    if is_creator:
+        choice.approved = not choice.approved
+        choice.save()
+        # Always return an HttpResponseRedirect after successfully dealing
+        # with POST data. This prevents data from being posted twice if a
+        # user hits the Back button.
+        return HttpResponseRedirect(reverse("polls:choice", args=(choice.question.id,)))
 
 
 def add_choice(request, question_id):
