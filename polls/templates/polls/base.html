@@ -1,0 +1,25 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Document</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        {% block style %}
+        {% endblock %}
+    </head>
+    <body>
+        <div align="right">
+            {% if user.is_authenticated %}
+                <span>Welcome, {{ user.username }}&nbsp;&nbsp;</span>
+                <span><a href="{% url 'logout' %}">Logout</a></span>
+            {% else %}
+                <span><a href="{% url 'users:signup' %}">Sign Up</a>&nbsp;&nbsp;</span>
+                <span><a href="{% url 'users:login' %}">Log In</a></span>
+            {% endif %}
+        </div>
+        {% block content %}
+        {% endblock %}
+    </body>
+</html>

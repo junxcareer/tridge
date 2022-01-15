@@ -1,13 +1,6 @@
-<div align="right">
-    {% if user.is_authenticated %}
-        <span>Welcome, {{ user.username }}&nbsp;&nbsp;</span>
-        <span><a href="{% url 'logout' %}">Logout</a></span>
-    {% else %}
-        <span><a href="{% url 'users:signup' %}">Sign Up</a>&nbsp;&nbsp;</span>
-        <span><a href="{% url 'users:login' %}">Log In</a></span>
-    {% endif %}
-</div>
+{% extends "polls/base.html" %}
 
+{% block content %}
 <form action="{% url 'polls:vote' question.id %}" method="post">
     {% csrf_token %}
     <fieldset>
@@ -79,3 +72,4 @@
         </form>
     {% endif %}
 </div>
+{% endblock %}

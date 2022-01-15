@@ -1,3 +1,6 @@
+{% extends "polls/base.html" %}
+
+{% block content %}
 <div>
     <span><strong>{{ comment.name }}</strong></span><span> at {{ comment.created_on|date:"Y-m-d h:i:s" }}</span>
 </div>
@@ -18,3 +21,4 @@
         <input type="submit" value="Submit">
     </form>
 </div>
+{% endblock %}
