@@ -11,4 +11,14 @@ class CommentForm(forms.ModelForm):
 class ChoiceForm(forms.ModelForm):
     class Meta:
         model = Choice
-        fields = ('choice_text', )
+        fields = ('choice_text',)
+
+
+class SearchForm(forms.Form):
+    categories = (
+        (['Question', 'Choice'], 'All'),
+        (['Question'], 'Question'),
+        (['Choice'], 'Choice')
+    )
+    category = forms.ChoiceField(choices=categories)
+    keyword = forms.CharField(max_length=30)

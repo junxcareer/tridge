@@ -1,0 +1,34 @@
+{% extends "polls/base.html" %}
+
+{% block content %}
+    <fieldset>
+        <div>
+            Search question/choice
+            <form action="{% url 'polls:search' %}" method="post">
+                {% csrf_token %}
+                {{ resp_search_form.as_p }}
+                <input type="submit" value="Search">
+            </form>
+        </div>
+    </fieldset>
+
+    <div>
+        <h3>Search results</h3>
+        <h4>Questions</h4>
+        {% if questions %}
+            {% for question in questions %}
+                <div><a href="{% url 'polls:detail' question.id %}">{{ question }}</a></div>
+            {% endfor %}
+        {% else %}
+            No results found
+        {% endif %}
+        <h4>Choices</h4>
+        {% if choices %}
+            {% for choice in choices %}
+                <div><a href="{% url 'polls:detail' choice.question.id %}">{{ choice.choice_text }}</a></div>
+            {% endfor %}
+        {% else %}
+            No results found
+        {% endif %}
+    </div>
+{% endblock %}

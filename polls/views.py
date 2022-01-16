@@ -12,7 +12,7 @@ import django_filters
 from utils.url import restify
 
 from .models import Choice, Question, Comment
-from .forms import CommentForm, ChoiceForm
+from .forms import CommentForm, ChoiceForm, SearchForm
 from .serializers import QuestionSerializer
 from .paginations import QuestionPagination
 
@@ -187,6 +187,31 @@ def vote(request, question_id):
         # with POST data. This prevents data from being posted twice if a
         # user hits the Back button.
         return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
+
+
+def search(request):
+    if request.method == 'GET':
+        return HttpResponseRedirect(reverse("polls:index"))
+
+    if request.method == 'POST':
+        category = request.POST['category']
+        keyword = request.POST['keyword']
+        response = {'category': category, 'keyword': keyword}
+
+        if 'Question' in category :
+            response['questions'] = Question.objects.filter(question_text__icontains=keyword)
+        if 'Choice' in category:
+            response['choices'] = Choice.objects.filter(choice_text__icontains=keyword)
+
+        response['resp_search_form'] = SearchForm(initial={'category': category, 'keyword': keyword})
+
+        return render(
+            request,
+            "polls/search_result.html",
+            response
+        )
+    else:
+        raise Http404('No valid access: only POST request is accepted')
 
 
 # API

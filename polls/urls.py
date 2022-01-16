@@ -12,4 +12,5 @@ urlpatterns = [
     path('<int:choice_id>/approve_choice/', views.approve_choice, name='approve_choice'),
     path('<int:question_id>/choice/', views.ChoiceView.as_view(), name='choice'),
     path('<int:comment_id>/reply/', views.add_reply, name='reply'),
+    path('search/', views.search, name='search')
 ]
