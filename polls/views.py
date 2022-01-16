@@ -47,11 +47,26 @@ class ChoiceView(generic.ListView):
         choices = question.choice_set.all()
         context['choices'] = choices
 
-        user = self.request.user
-        is_creator = user.id == question.creator_id
+        is_creator = self.request.user.id == question.creator_id
         context['is_creator'] = is_creator
 
         return context
+
+    def post(self, request, *args, **kwargs):
+        question_id = self.kwargs.get('question_id')
+
+        question = get_object_or_404(Question, pk=question_id)
+        choices = question.choice_set.all()
+
+        is_to_limit = len(choices) == question.max_choices
+
+        if not is_to_limit:
+            choice_form = ChoiceForm(data=request.POST)
+            if choice_form.is_valid():
+                new_choice = choice_form.save(commit=False)
+                new_choice.question = question
+                new_choice.save()
+        return HttpResponseRedirect(reverse("polls:detail", args=(question.id,)))
 
 
 class DetailView(generic.DetailView):
@@ -123,9 +138,8 @@ def add_reply(request, comment_id):
 
 def approve_choice(request, choice_id):
     choice = get_object_or_404(Choice, pk=choice_id)
-    creator = request.user
 
-    is_creator = creator.id == choice.question.creator_id
+    is_creator = request.user.id == choice.question.creator_id
 
     if is_creator:
         choice.approved = not choice.approved
@@ -141,7 +155,6 @@ def add_choice(request, question_id):
     choices = question.choice_set.all()
 
     is_to_limit = len(choices) == question.max_choices
-
     if request.method == 'GET':
         return render(
             request,
@@ -149,7 +162,7 @@ def add_choice(request, question_id):
             {
                 "choices": choices,
                 "question": question,
-                "is_to_limit": is_to_limit
+                "is_to_limit": is_to_limit,
             }
         )
 
@@ -160,7 +173,6 @@ def add_choice(request, question_id):
                 new_choice = choice_form.save(commit=False)
                 new_choice.question = question
                 new_choice.save()
-
         return HttpResponseRedirect(reverse("polls:detail", args=(question.id,)))
     else:
         raise Http404('No valid access')
@@ -198,7 +210,7 @@ def search(request):
         keyword = request.POST['keyword']
         response = {'category': category, 'keyword': keyword}
 
-        if 'Question' in category :
+        if 'Question' in category:
             response['questions'] = Question.objects.filter(question_text__icontains=keyword)
         if 'Choice' in category:
             response['choices'] = Choice.objects.filter(choice_text__icontains=keyword)

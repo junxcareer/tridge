@@ -2,6 +2,7 @@
 
 {% block content %}
 <div>
+    <a href="{% url 'polls:detail' question.id %}">Back to question</a>
     <h3>Choices for the question "{{ question.question_text }}"</h3>
     <ol>
         {% for choice in choices %}
@@ -14,7 +15,7 @@
                         <a href={% url 'polls:approve_choice' choice.id %}>approve</a>
                     {% endif %}
                 {% else %}
-                    {% if choice.approved %} (approved) {% endif %}
+                    {% if choice.approved %} (approved) {% else %} (not approved) {% endif %}
                 {% endif %}
             </li>
         {% endfor %}
