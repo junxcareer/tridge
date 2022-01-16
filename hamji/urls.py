@@ -23,10 +23,12 @@ from . import views
 
 router = routers.DefaultRouter()
 router.register(r"users", views.UserViewSet)
-router.register(r"questions", polls.views.QuestionViewSet)
+router.register(r"questions", polls.views.QuestionRestViewSet)
 
 urlpatterns = [
     path("_api/", include(router.urls)),
     path("polls/", include("polls.urls")),
+    path("users/", include("users.urls")),
     path("admin/", admin.site.urls),
+    path('accounts/', include('django.contrib.auth.urls')),
 ]

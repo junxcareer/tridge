@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "tridge"
+version = "0.1.0"
+description = ""
+authors = ["junpark <junpark@vcanus.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+djangorestframework = "^3.13.1"
+requests = "^2.27.1"
+django-filter = "^21.1"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+

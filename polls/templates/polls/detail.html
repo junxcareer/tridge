@@ -1,12 +1,75 @@
+{% extends "polls/base.html" %}
+
+{% block content %}
 <form action="{% url 'polls:vote' question.id %}" method="post">
-{% csrf_token %}
-<fieldset>
-    <legend><h1>{{ question.question_text }}</h1></legend>
-    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-    {% for choice in question.choice_set.all %}
-        <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
-        <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
-    {% endfor %}
-</fieldset>
-<input type="submit" value="Vote">
+    {% csrf_token %}
+    <fieldset>
+        <legend><h1>{{ question.question_text }}</h1></legend>
+        <div>created by {{ question.creator.username }}</div>
+        {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+        {% for choice in question.choice_set.all %}
+            {% if choice.approved %}
+                <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+                <label for="choice{{ forloop.counter }}">
+                    {{ choice.choice_text }} {% if choice.suggested %} (new!) {% endif %}
+                </label><br>
+            {% endif %}
+        {% endfor %}
+        <br>
+        {% if is_creator %}
+            <a href="{% url 'polls:choice' question.id %}">
+                Manage choices
+            </a>
+        {% else %}
+            {% if is_to_limit %}
+                Can't suggest new choice (limit: {{ question.max_choices }})
+            {% else %}
+                <a href="{% url 'polls:choice' question.id %}">
+                    Suggest new choice
+                </a>
+            {% endif %}
+        {% endif %}
+    </fieldset>
+    <input type="submit" value="Vote">
 </form>
+
+<div>
+    <ul>
+        {% for comment in question.comments.all %}
+            {% if not comment.parent_id %}
+                <li>
+                    <div>
+                        <span><strong>{{ comment.name }}</strong></span><span> at {{ comment.created_on|date:"Y-m-d h:i:s" }}</span>
+                    </div>
+                    <div>{{ comment.body }}</div>
+                    <div><a href="{% url 'polls:reply' comment.id %}">reply</a></div>
+                    <br>
+                    {% include "polls/comment_tree.html" with parent_comment=comment comments=question.comments.all %}
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+</div>
+
+<div>
+    {% if new_comment %}
+        <div>
+            Your comment is awaiting moderation
+        </div>
+    {% else %}
+        <h3>Leave a comment</h3>
+        <form action="{% url 'polls:comment' question.id %}" method="post" id="comment_form">
+            {% csrf_token %}
+            <div>
+                <label for="comment_name">Name: </label>
+                <input id="comment_name" type="text" name="name">
+            </div>
+            <div>
+                <label for="comment_body">Comment: </label>
+                <textarea id="comment_body" name="body" form="comment_form"></textarea>
+            </div>
+            <input type="submit" value="Submit">
+        </form>
+    {% endif %}
+</div>
+{% endblock %}

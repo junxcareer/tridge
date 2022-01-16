@@ -1,0 +1,32 @@
+{% extends "polls/base.html" %}
+
+{% block content %}
+<div>
+    <a href="{% url 'polls:detail' question.id %}">Back to question</a>
+    <h3>Choices for the question "{{ question.question_text }}"</h3>
+    <ol>
+        {% for choice in choices %}
+            <li>
+                {{ choice.choice_text }}
+                {% if is_creator %}
+                    {% if choice.approved %}
+                        <a href={% url 'polls:approve_choice' choice.id %}>cancel</a>
+                    {% else %}
+                        <a href={% url 'polls:approve_choice' choice.id %}>approve</a>
+                    {% endif %}
+                {% else %}
+                    {% if choice.approved %} (approved) {% else %} (not approved) {% endif %}
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ol>
+    <form action="{% url 'polls:choice' question.id %}" method="post" id="choice_form">
+        {% csrf_token %}
+        <div>
+            <label for="choice_body">New Choice: </label>
+            <textarea id="choice_body" name="choice_text" form="choice_form"></textarea>
+        </div>
+        <input type="submit" value="Submit">
+    </form>
+</div>
+{% endblock %}

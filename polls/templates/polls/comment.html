@@ -1,0 +1,29 @@
+{% extends "polls/base.html" %}
+
+{% block content %}
+    <a href="{% url 'polls:detail' comment.question.id %}">Back to question</a>
+
+    <ul>
+        <li>
+            <div>
+                <span><strong>{{ comment.name }}</strong></span><span> at {{ comment.created_on|date:"Y-m-d h:i:s" }}</span>
+            </div>
+            <div>{{ comment.body }}</div>
+        </li>
+    </ul>
+    <div>
+        <h3>Leave a reply</h3>
+        <form action="{% url 'polls:reply' comment.id %}" method="post" id="comment_form">
+            {% csrf_token %}
+            <div>
+                <label for="comment_name">Name: </label>
+                <input id="comment_name" type="text" name="name">
+            </div>
+            <div>
+                <label for="comment_body">Comment: </label>
+                <textarea id="comment_body" name="body" form="comment_form"></textarea>
+            </div>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+{% endblock %}
